@@ -188,6 +188,7 @@
   .stat .s { font-size: 12.5px; color: var(--text-3); margin-top: 2px; }
   .stat.hl { border-color: color-mix(in srgb, var(--accent) 35%, var(--border)); }
   .stat.hl .v { color: var(--accent); }
+  .ldot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--live); margin-left: 5px; vertical-align: 1px; animation: pulse 2s ease-in-out infinite; }
 
   /* ---------- section head ---------- */
   .sec-head { display: flex; align-items: center; gap: 11px; padding: 13px 18px; border-bottom: 1px solid var(--border); background: var(--surface-2); }
@@ -458,6 +459,12 @@
       var i = STEPS.indexOf(s.step);
       d.legs[s.step.key] = { rows: s.data.rows, done: i < d.lastIdx || d.finished, cur: i === d.lastIdx && !d.finished };
     });
+    // race clock runs from the actual start (official start as fallback) until the finish
+    var start = null;
+    d.info.forEach(function (it) { if (!start && /actu/i.test(it.k) && has(it.v)) start = it.v; });
+    d.info.forEach(function (it) { if (!start && /offici/i.test(it.k) && has(it.v)) start = it.v; });
+    d.startSecs = toSecs(start);
+    d.live = d.startSecs != null && !d.finished;
     // rankings can lag a checkpoint behind the times; remember the latest row that has them
     d.ranked = null;
     for (var si = d.segs.length - 1; si >= 0 && !d.ranked; si--) {
@@ -488,6 +495,10 @@
     var pad = function (n) { return (n < 10 ? '0' : '') + n; };
     return h ? h + ':' + pad(m) + ':' + pad(sec) : m + ':' + pad(sec);
   }
+  function fmtClock(s) {
+    var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+    return pad(Math.floor(s / 3600)) + ':' + pad(Math.floor((s % 3600) / 60)) + ':' + pad(s % 60);
+  }
   // clock time in the race's own timezone, so "x min geleden" is right anywhere
   function nowSecsNL() {
     try {
@@ -506,6 +517,20 @@
     if (d < 3600) return Math.floor(d / 60) + ' min geleden';
     return Math.floor(d / 3600) + ' u ' + Math.floor((d % 3600) / 60) + ' min geleden';
   }
+
+  function liveText(startSecs) {
+    var n = nowSecsNL();
+    if (n == null) return '–';
+    var d = n - startSecs;
+    if (d < 0 || d > 20 * 3600) return '–';
+    return fmtSecs(d);
+  }
+  function liveHtml(x) { return '<span data-start="' + x.startSecs + '">' + liveText(x.startSecs) + '</span>'; }
+  function tickClocks() {
+    var els = document.querySelectorAll('[data-start]');
+    for (var i = 0; i < els.length; i++) els[i].textContent = liveText(+els[i].getAttribute('data-start'));
+  }
+  setInterval(tickClocks, 1000);
 
   function ranks(r) {
     if (!r || !has(r[0])) return '';
@@ -567,9 +592,10 @@
 
     var row = function (label, icon, color, va, vb, sa, sb, dSecs, dAt) {
       var win = dSecs == null ? 0 : (dSecs < 0 ? -1 : dSecs > 0 ? 1 : 0); // -1: A faster, 1: B faster
-      h += '<div class="lg"><span class="dotc" style="--sc:' + color + '">' + icon + '</span>' + esc(label) + '</div>';
-      h += '<div class="tv num' + (win === -1 ? ' win' : win === 1 ? ' lose' : '') + '">' + val(va) + (sa ? '<small>' + sa + '</small>' : '') + '</div>';
-      h += '<div class="tv num' + (win === 1 ? ' win' : win === -1 ? ' lose' : '') + '">' + val(vb) + (sb ? '<small>' + sb + '</small>' : '') + '</div>';
+      h += '<div class="lg"><span class="dotc" style="--sc:' + color + '">' + icon + '</span>' + label + '</div>';
+      var vv = function (v) { return v && typeof v === 'object' ? v.html : val(v); };
+      h += '<div class="tv num' + (win === -1 ? ' win' : win === 1 ? ' lose' : '') + '">' + vv(va) + (sa ? '<small>' + sa + '</small>' : '') + '</div>';
+      h += '<div class="tv num' + (win === 1 ? ' win' : win === -1 ? ' lose' : '') + '">' + vv(vb) + (sb ? '<small>' + sb + '</small>' : '') + '</div>';
       h += '<div class="df">';
       if (win) h += '<span><b>' + esc(first(win === -1 ? A.name : B.name)) + '</b> ' + fmtSecs(dSecs) + ' sneller' + (dAt ? '<small>bij ' + esc(dAt) + '</small>' : '') + '</span>';
       else if (dSecs === 0) h += '<span>gelijk</span>';
@@ -578,9 +604,13 @@
 
     // current state
     var ra = a.lastRow, rb = b.lastRow;
-    row('Racetijd', '⏱', 'var(--text-3)',
-        ra && ra.raceTime, rb && rb.raceTime,
-        ra ? 'bij ' + esc(ra.loc) : '', rb ? 'bij ' + esc(rb.loc) : '', null, '');
+    var rt = function (x, r) { return x.live ? { html: liveHtml(x) } : (r && r.raceTime); };
+    var rtSub = function (x, r) {
+      if (!r) return x.live ? 'nog geen meetpunt' : '';
+      return (x.live ? esc(r.raceTime) + ' bij ' : 'bij ') + esc(r.loc);
+    };
+    row(a.live || b.live ? 'Racetijd <span class="ldot"></span>' : 'Racetijd', '⏱', 'var(--text-3)',
+        rt(a, ra), rt(b, rb), rtSub(a, ra), rtSub(b, rb), null, '');
     row('Plaats algemeen', '#', 'var(--text-3)',
         a.ranked && a.ranked.raceRank[0], b.ranked && b.ranked.raceRank[0],
         a.ranked && a.ranked !== ra ? 'bij ' + esc(a.ranked.loc) : '', b.ranked && b.ranked !== rb ? 'bij ' + esc(b.ranked.loc) : '', null, '');
@@ -666,16 +696,21 @@
     h += '</ol></div></section>';
 
     /* ---- stat tiles ---- */
-    if (lastRow) {
+    if (lastRow || d.live) {
       var rk = d.ranked ? d.ranked.raceRank : ['', '', ''];
       var rkAt = d.ranked && d.ranked !== lastRow ? ' bij ' + esc(d.ranked.loc) : '';
-      var when = ago(lastRow.clock);
+      var when = lastRow ? ago(lastRow.clock) : '';
       h += '<div class="stats">';
-      h += '<div class="stat hl s-time"><div class="k">Racetijd</div><div class="v num">' + val(lastRow.raceTime) + '</div><div class="s">bij ' + esc(lastRow.loc) + '</div></div>';
+      if (d.live) {
+        h += '<div class="stat hl s-time"><div class="k">Racetijd <span class="ldot"></span></div><div class="v num">' + liveHtml(d) + '</div>' +
+             '<div class="s">' + (lastRow ? 'laatste meetpunt ' + esc(lastRow.raceTime) + ' bij ' + esc(lastRow.loc) : 'gestart om ' + esc(fmtClock(d.startSecs))) + '</div></div>';
+      } else {
+        h += '<div class="stat hl s-time"><div class="k">' + (finished ? 'Eindtijd' : 'Racetijd') + '</div><div class="v num">' + val(lastRow && lastRow.raceTime) + '</div><div class="s">bij ' + esc(lastRow ? lastRow.loc : '') + '</div></div>';
+      }
       h += '<div class="stat s-rank"><div class="k">Algemeen</div><div class="v num">' + val(rk[0]) + '</div><div class="s">plaats totaal' + rkAt + '</div></div>';
       h += '<div class="stat s-rank"><div class="k">Geslacht</div><div class="v num">' + val(rk[1]) + '</div><div class="s">in geslacht' + rkAt + '</div></div>';
       h += '<div class="stat s-rank"><div class="k">Categorie</div><div class="v num">' + val(rk[2]) + '</div><div class="s">in categorie' + rkAt + '</div></div>';
-      h += '<div class="stat s-last"><div class="k">Laatste passage</div><div class="v num">' + val(lastRow.clock) + '</div><div class="s">' + (when ? esc(when) : 'tijdstip') + '</div></div>';
+      h += '<div class="stat s-last"><div class="k">Laatste passage</div><div class="v num">' + val(lastRow && lastRow.clock) + '</div><div class="s">' + (when ? esc(when) : 'tijdstip') + '</div></div>';
       h += '</div>';
     }
 
