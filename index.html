@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Max Huisman — Live uitslag</title>
+<style>
+  :root {
+    --bg:            #f4f5f7;
+    --bg-grad:       radial-gradient(1200px 600px at 50% -10%, #e8ecf5 0%, #f4f5f7 60%);
+    --surface:       #ffffff;
+    --surface-2:     #fafbfc;
+    --border:        #e3e6eb;
+    --border-strong: #d2d7de;
+    --text:          #14171c;
+    --text-2:        #5b6473;
+    --text-3:        #8b94a3;
+    --accent:        #2f6df6;
+    --live:          #18a558;
+    --swim:          #2f8de4;
+    --bike:          #e5892b;
+    --run:           #22a06b;
+    --trans:         #8b7cd8;
+    --finish:        #d8456b;
+    --other:         #6b7684;
+    --shadow:        0 1px 2px rgba(20,23,28,.05), 0 8px 24px -12px rgba(20,23,28,.14);
+    --radius:        14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:            #0d1015;
+      --bg-grad:       radial-gradient(1200px 600px at 50% -10%, #171e2b 0%, #0d1015 60%);
+      --surface:       #151a21;
+      --surface-2:     #1a2029;
+      --border:        #252d38;
+      --border-strong: #323c4a;
+      --text:          #eef1f5;
+      --text-2:        #a3adbb;
+      --text-3:        #6f7988;
+      --accent:        #6c9bff;
+      --live:          #35c77b;
+      --swim:          #55a8f0;
+      --bike:          #f0a94c;
+      --run:           #3fc492;
+      --trans:         #a394ec;
+      --finish:        #f0678c;
+      --other:         #8b95a3;
+      --shadow:        0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    background-image: var(--bg-grad);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 24px 20px 72px; }
+
+  /* ---------- top bar ---------- */
+  .topbar {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .brand { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--text-3); }
+  .topbar .spacer { flex: 1 1 auto; }
+  .live {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--live);
+    background: color-mix(in srgb, var(--live) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--live) 30%, transparent);
+    padding: 4px 10px; border-radius: 999px;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--live); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.82); } }
+  @media (prefers-reduced-motion: reduce) { .dot { animation: none; } }
+  .stamp { font-size: 12.5px; color: var(--text-3); }
+  .btn {
+    font: inherit; font-size: 13px; font-weight: 600;
+    color: var(--text-2); background: var(--surface); cursor: pointer;
+    border: 1px solid var(--border-strong); border-radius: 9px; padding: 6px 13px;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .btn:hover { color: var(--text); border-color: var(--text-3); }
+  .btn:active { transform: translateY(1px); }
+  .btn[disabled] { opacity: .55; cursor: default; }
+
+  /* ---------- cards ---------- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .card + .card, .stack > * + * { margin-top: 18px; }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 26px 26px 22px; }
+  .hero-top { display: flex; align-items: flex-start; gap: 18px; flex-wrap: wrap; }
+  .hero h1 {
+    margin: 0; font-size: clamp(28px, 6vw, 42px); font-weight: 700;
+    letter-spacing: -.025em; line-height: 1.1;
+  }
+  .bib {
+    margin-left: auto; text-align: right; flex: 0 0 auto;
+    padding: 8px 14px; border-radius: 11px;
+    background: var(--surface-2); border: 1px solid var(--border);
+  }
+  .bib .k { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--text-3); }
+  .bib .v { display: block; font-size: 24px; font-weight: 700; letter-spacing: -.02em; line-height: 1.2; }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px; }
+  .chip {
+    font-size: 12.5px; font-weight: 500; color: var(--text-2);
+    background: var(--surface-2); border: 1px solid var(--border);
+    padding: 4px 11px; border-radius: 999px;
+  }
+  .chip b { color: var(--text); font-weight: 650; }
+
+  /* ---------- stat tiles ---------- */
+  .stats {
+    display: grid; gap: 1px; background: var(--border);
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    border-top: 1px solid var(--border);
+  }
+  .stat { background: var(--surface); padding: 16px 18px 15px; }
+  .stat .k { font-size: 10.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--text-3); }
+  .stat .v { font-size: 26px; font-weight: 700; letter-spacing: -.02em; line-height: 1.25; margin-top: 3px; }
+  .stat .s { font-size: 12.5px; color: var(--text-3); margin-top: 1px; }
+  .stat.hl .v { color: var(--accent); }
+
+  /* ---------- section head ---------- */
+  .sec-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 15px 20px; border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+  .sec-head .icon { font-size: 17px; line-height: 1; }
+  .sec-head h2 {
+    margin: 0; font-size: 13px; font-weight: 700;
+    letter-spacing: .07em; text-transform: uppercase; color: var(--text-2);
+  }
+  .sec-head .tot { margin-left: auto; font-size: 19px; font-weight: 700; letter-spacing: -.02em; }
+  .seg-card { border-left: 3px solid var(--c); }
+  .seg-card .sec-head h2 { color: var(--c); }
+  .seg-card .sec-head .tot { color: var(--c); }
+
+  /* ---------- key/value grid ---------- */
+  .kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0 28px; padding: 6px 20px 14px; }
+  .kv .row { display: flex; gap: 14px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .kv .row:last-child { border-bottom: 0; }
+  .kv .k { flex: 0 0 42%; font-size: 13px; color: var(--text-3); }
+  .kv .v { font-weight: 600; font-size: 14px; }
+
+  /* ---------- tables ---------- */
+  .scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--text-3); text-align: right; padding: 11px 14px 9px;
+    border-bottom: 1px solid var(--border); white-space: nowrap;
+  }
+  thead th:first-child { text-align: left; padding-left: 20px; }
+  tbody td { padding: 12px 14px; border-bottom: 1px solid var(--border); text-align: right; vertical-align: top; white-space: nowrap; }
+  tbody td:first-child { text-align: left; padding-left: 20px; white-space: normal; }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr:hover td { background: var(--surface-2); }
+  .loc { font-weight: 650; }
+  .big { font-size: 16px; font-weight: 650; letter-spacing: -.01em; }
+  .sub { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+  .rank { font-size: 12px; color: var(--text-3); margin-top: 3px; }
+  .rank b { color: var(--text-2); font-weight: 650; }
+  .muted { color: var(--text-3); font-weight: 400; }
+
+  .legend { padding: 11px 20px; font-size: 12px; color: var(--text-3); background: var(--surface-2); border-top: 1px solid var(--border); }
+
+  /* ---------- states ---------- */
+  .msg { padding: 44px 24px; text-align: center; color: var(--text-3); }
+  .msg.err { color: var(--finish); }
+  .msg .t { font-weight: 650; color: var(--text); margin-bottom: 6px; font-size: 16px; }
+  .skel { height: 13px; border-radius: 6px; background: linear-gradient(90deg, var(--border) 25%, var(--surface-2) 50%, var(--border) 75%); background-size: 200% 100%; animation: sh 1.3s linear infinite; }
+  @keyframes sh { to { background-position: -200% 0; } }
+
+  footer { margin-top: 22px; font-size: 12px; color: var(--text-3); text-align: center; }
+  footer a { color: var(--text-3); }
+
+  @media (max-width: 560px) {
+    .wrap { padding: 18px 14px 56px; }
+    .hero { padding: 20px 18px 18px; }
+    .bib { margin-left: 0; }
+    thead th:first-child, tbody td:first-child { padding-left: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="topbar">
+    <span class="brand">Ultimate Live · Event 7420</span>
+    <span class="live"><span class="dot"></span>Live</span>
+    <span class="spacer"></span>
+    <span class="stamp" id="stamp"></span>
+    <button class="btn" id="refresh" type="button">Ververs</button>
+  </div>
+
+  <div id="app" class="stack">
+    <div class="card"><div class="msg"><div class="t">Gegevens laden…</div><div>Even geduld</div></div></div>
+  </div>
+
+  <footer>
+    Gegevens van <a href="https://live.ultimate.dk" target="_blank" rel="noopener">live.ultimate.dk</a> · ververst automatisch elke 30 s
+  </footer>
+</div>
+
+<!-- the endpoint writes its HTML into this element -->
+<div id="PARTICIPANTINFO" hidden></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var ENDPOINT = 'https://live.ultimate.dk/desktop/front/data.php';
+  var PARAMS = { eventid: '7420', mode: 'participantinfo', pid: '2579', language: 'nl' };
+  var REFRESH_MS = 30000;
+
+  var app = document.getElementById('app');
+  var stamp = document.getElementById('stamp');
+  var refreshBtn = document.getElementById('refresh');
+  var sink = document.getElementById('PARTICIPANTINFO');
+
+  /* -------------------------------------------------------------
+     Load. The endpoint has no CORS headers, but it is a plain JS
+     file that assigns innerHTML — so a <script> tag loads it fine.
+     ------------------------------------------------------------- */
+  function load() {
+    return new Promise(function (resolve, reject) {
+      // stubs for the globals the payload touches after the assignment
+      window._gaq = window._gaq || { push: function () {} };
+      window.details_active = 0;
+      window.ajaxprocess = 0;
+      window.doCloseParticipantInfo = function () {};
+
+      var old = document.getElementById('feed');
+      if (old) old.remove();
+      sink.innerHTML = '';
+
+      var qs = [];
+      for (var k in PARAMS) qs.push(k + '=' + encodeURIComponent(PARAMS[k]));
+      qs.push('_=' + Date.now());
+
+      var s = document.createElement('script');
+      s.id = 'feed';
+      s.src = ENDPOINT + '?' + qs.join('&');
+      s.onload = function () {
+        if (!sink.firstChild) reject(new Error('Geen gegevens ontvangen'));
+        else resolve(sink);
+      };
+      s.onerror = function () { reject(new Error('Kon de server niet bereiken')); };
+      document.head.appendChild(s);
+    });
+  }
+
+  /* ------------------------------- parse ------------------------------- */
+  function txt(el) { return el ? el.textContent.replace(/\s+/g, ' ').trim() : ''; }
+
+  function parse(root) {
+    var bigs = [].map.call(root.querySelectorAll('.participant_value_big'), txt);
+
+    // Info groups, walked in document order so each pair lands under its heading.
+    var groups = [], g = null;
+    [].forEach.call(root.querySelectorAll('.participant_section_hdr, td.participant_hdr_small'), function (el) {
+      if (el.className.indexOf('participant_section_hdr') > -1) {
+        g = { title: txt(el), items: [] };
+        groups.push(g);
+        return;
+      }
+      var v = el.nextElementSibling;
+      if (!v) return;
+      if (!g) { g = { title: '', items: [] }; groups.push(g); }
+      g.items.push({ k: txt(el), v: txt(v) });
+    });
+
+    // Splits, grouped by segment banner; projections are the 5-column rows.
+    var segments = [], cur = null, projections = [], projTitle = '';
+    [].forEach.call(root.querySelectorAll('tr'), function (tr) {
+      var banner = tr.querySelector('td.split_segment');
+      if (banner) { cur = { name: txt(banner), rows: [] }; segments.push(cur); return; }
+
+      var c = [].map.call(tr.children, txt);
+
+      if (tr.querySelector('td.details_racetime')) {
+        if (!cur) { cur = { name: '', rows: [] }; segments.push(cur); }
+        cur.rows.push({
+          loc:      c[0],
+          raceTime: c[1],  raceRank: [c[2], c[3], c[4]],
+          segTime:  c[5],  segSpeed: c[6],  segRank: [c[7], c[8], c[9]],
+          lapTime:  c[10], lapSpeed: c[11], lapRank: [c[12], c[13], c[14]],
+          clock:    c[15]
+        });
+        return;
+      }
+
+      if (tr.querySelectorAll('td.split_time').length === 5 && !tr.querySelector('td.split_hdr')) {
+        projections.push({ loc: c[0], raceTime: c[1], segTime: c[2], lapTime: c[3], clock: c[4] });
+      }
+    });
+
+    // the heading directly above the projections block
+    var heads = [].map.call(root.querySelectorAll('.participant_section_hdr'), txt);
+    if (projections.length && heads.length) projTitle = heads[heads.length - 1];
+
+    // drop headings that carry no key/value pairs (e.g. the projections one)
+    groups = groups.filter(function (x) { return x.items.length; });
+
+    return { name: bigs[0] || '', bib: bigs[1] || '', groups: groups, segments: segments, projections: projections, projTitle: projTitle };
+  }
+
+  /* ------------------------------- render ------------------------------ */
+  var THEME = [
+    { re: /swim|zwem/,                          c: 'var(--swim)',   icon: '🏊' },
+    { re: /^t1|^t2|wissel|transition|overgang/, c: 'var(--trans)',  icon: '🔁' },
+    { re: /bike|fiets|cycl|rad/,                c: 'var(--bike)',   icon: '🚴' },
+    { re: /run|loop|lauf/,                      c: 'var(--run)',    icon: '🏃' },
+    { re: /finish|doel/,                        c: 'var(--finish)', icon: '🏁' }
+  ];
+  function theme(name) {
+    var n = (name || '').toLowerCase();
+    for (var i = 0; i < THEME.length; i++) if (THEME[i].re.test(n)) return THEME[i];
+    return { c: 'var(--other)', icon: '●' };
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+    });
+  }
+  function has(v) { return v && v !== '-' && v !== '--'; }
+  function val(v) { return has(v) ? esc(v) : '<span class="muted">–</span>'; }
+
+  function rankLine(r) {
+    if (!r || !has(r[0])) return '';
+    var parts = [];
+    if (has(r[0])) parts.push('<b>' + esc(r[0]) + '</b>');
+    if (has(r[1])) parts.push('<b>' + esc(r[1]) + '</b>');
+    if (has(r[2])) parts.push('<b>' + esc(r[2]) + '</b>');
+    return '<div class="rank num">' + parts.join(' <span class="muted">·</span> ') + '</div>';
+  }
+
+  function cell(time, speed, rank) {
+    var h = '<div class="big num">' + val(time) + '</div>';
+    if (has(speed)) h += '<div class="sub num">' + esc(speed) + '</div>';
+    h += rankLine(rank);
+    return h;
+  }
+
+  function render(d) {
+    var h = '';
+
+    /* hero + stat tiles */
+    var flat = [];
+    d.segments.forEach(function (s) { s.rows.forEach(function (r) { flat.push(r); }); });
+    var last = flat[flat.length - 1];
+
+    h += '<div class="card">';
+    h += '<div class="hero"><div class="hero-top"><h1>' + esc(d.name || 'Deelnemer') + '</h1>';
+    if (d.bib) h += '<div class="bib"><span class="k">Startnr</span><span class="v num">' + esc(d.bib) + '</span></div>';
+    h += '</div>';
+
+    var chips = [];
+    d.groups.forEach(function (g) {
+      g.items.forEach(function (it) {
+        chips.push('<span class="chip">' + esc(it.k) + ' <b>' + esc(it.v) + '</b></span>');
+      });
+    });
+    if (chips.length) h += '<div class="chips">' + chips.join('') + '</div>';
+    h += '</div>';
+
+    if (last) {
+      h += '<div class="stats">';
+      h += '<div class="stat hl"><div class="k">Racetijd</div><div class="v num">' + val(last.raceTime) + '</div><div class="s">' + esc(last.loc) + '</div></div>';
+      h += '<div class="stat"><div class="k">Totaal</div><div class="v num">' + val(last.raceRank[0]) + '</div><div class="s">plaats algemeen</div></div>';
+      h += '<div class="stat"><div class="k">Geslacht</div><div class="v num">' + val(last.raceRank[1]) + '</div><div class="s">plaats in geslacht</div></div>';
+      h += '<div class="stat"><div class="k">Categorie</div><div class="v num">' + val(last.raceRank[2]) + '</div><div class="s">plaats in categorie</div></div>';
+      h += '<div class="stat"><div class="k">Laatste passage</div><div class="v num">' + val(last.clock) + '</div><div class="s">tijdstip</div></div>';
+      h += '</div>';
+    }
+    h += '</div>';
+
+    /* segment cards */
+    d.segments.forEach(function (s) {
+      if (!s.rows.length) return;
+      var t = theme(s.name);
+      var tot = s.rows[s.rows.length - 1].segTime;
+
+      h += '<div class="card seg-card" style="--c:' + t.c + '">';
+      h += '<div class="sec-head"><span class="icon">' + t.icon + '</span><h2>' + esc(s.name) + '</h2>';
+      if (has(tot)) h += '<span class="tot num">' + esc(tot) + '</span>';
+      h += '</div>';
+
+      h += '<div class="scroll"><table><thead><tr>' +
+           '<th>Lokatie</th><th>Racetijd</th><th>Segment</th><th>Ronde</th><th>Tijdstip</th>' +
+           '</tr></thead><tbody>';
+
+      s.rows.forEach(function (r) {
+        h += '<tr>' +
+             '<td><div class="loc">' + esc(r.loc) + '</div></td>' +
+             '<td>' + cell(r.raceTime, null, r.raceRank) + '</td>' +
+             '<td>' + cell(r.segTime, r.segSpeed, r.segRank) + '</td>' +
+             '<td>' + cell(r.lapTime, r.lapSpeed, r.lapRank) + '</td>' +
+             '<td><div class="big num">' + val(r.clock) + '</div></td>' +
+             '</tr>';
+      });
+
+      h += '</tbody></table></div>';
+      h += '<div class="legend">Plaatsen onder elke tijd: <b>totaal</b> · <b>geslacht</b> · <b>categorie</b></div>';
+      h += '</div>';
+    });
+
+    /* projections */
+    if (d.projections.length) {
+      h += '<div class="card">';
+      h += '<div class="sec-head"><span class="icon">📈</span><h2>' + esc(d.projTitle || 'Geschatte tijden') + '</h2></div>';
+      h += '<div class="scroll"><table><thead><tr>' +
+           '<th>Lokatie</th><th>Racetijd</th><th>Segment</th><th>Ronde</th><th>Tijdstip</th>' +
+           '</tr></thead><tbody>';
+      d.projections.forEach(function (p) {
+        h += '<tr>' +
+             '<td><div class="loc">' + esc(p.loc) + '</div></td>' +
+             '<td><div class="big num">' + val(p.raceTime) + '</div></td>' +
+             '<td><div class="big num">' + val(p.segTime) + '</div></td>' +
+             '<td><div class="big num">' + val(p.lapTime) + '</div></td>' +
+             '<td><div class="big num">' + val(p.clock) + '</div></td>' +
+             '</tr>';
+      });
+      h += '</tbody></table></div></div>';
+    }
+
+    if (!d.segments.length && !d.projections.length) {
+      h += '<div class="card"><div class="msg"><div class="t">Nog geen tussentijden</div>' +
+           '<div>Zodra de deelnemer een meetpunt passeert verschijnen de tijden hier.</div></div></div>';
+    }
+
+    app.innerHTML = h;
+  }
+
+  /* ------------------------------- cycle ------------------------------- */
+  function tick() {
+    refreshBtn.disabled = true;
+    return load()
+      .then(function (root) {
+        render(parse(root));
+        stamp.textContent = 'bijgewerkt ' + new Date().toLocaleTimeString('nl-NL');
+      })
+      .catch(function (e) {
+        app.innerHTML = '<div class="card"><div class="msg err"><div class="t">Laden mislukt</div><div>' +
+          esc(e.message) + '</div></div></div>';
+        stamp.textContent = '';
+      })
+      .then(function () { refreshBtn.disabled = false; });
+  }
+
+  refreshBtn.addEventListener('click', tick);
+  tick();
+  setInterval(tick, REFRESH_MS);
+})();
+</script>
+</body>
+</html>
