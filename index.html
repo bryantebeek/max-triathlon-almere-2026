@@ -468,6 +468,15 @@
     d.info.forEach(function (it) { if (!start && /offici/i.test(it.k) && has(it.v)) start = it.v; });
     d.startSecs = toSecs(start);
     d.live = d.startSecs != null && !d.finished;
+    d.legStart = null;
+    if (d.live && d.lastRow) {
+      var rt = toSecs(d.lastRow.raceTime), st = toSecs(d.lastRow.segTime);
+      if (rt != null && st != null) d.legStart = rt - st;
+      else if (d.segs.length > 1) {
+        var prev = d.segs[d.segs.length - 2].data.rows;
+        d.legStart = toSecs(prev[prev.length - 1].raceTime);
+      } else d.legStart = 0;
+    }
     // rankings can lag a checkpoint behind the times; remember the latest row that has them
     d.ranked = null;
     for (var si = d.segs.length - 1; si >= 0 && !d.ranked; si--) {
@@ -521,17 +530,19 @@
     return Math.floor(d / 3600) + ' u ' + Math.floor((d % 3600) / 60) + ' min geleden';
   }
 
-  function liveText(startSecs) {
+  function liveText(startSecs, offset) {
     var n = nowSecsNL();
     if (n == null) return '–';
-    var d = n - startSecs;
+    var d = n - startSecs - (offset || 0);
     if (d < 0 || d > 20 * 3600) return '–';
     return fmtSecs(d);
   }
-  function liveHtml(x) { return '<span data-start="' + x.startSecs + '">' + liveText(x.startSecs) + '</span>'; }
+  function liveHtml(x, offset) {
+    return '<span data-start="' + x.startSecs + '"' + (offset ? ' data-offset="' + offset + '"' : '') + '>' + liveText(x.startSecs, offset) + '</span>';
+  }
   function tickClocks() {
     var els = document.querySelectorAll('[data-start]');
-    for (var i = 0; i < els.length; i++) els[i].textContent = liveText(+els[i].getAttribute('data-start'));
+    for (var i = 0; i < els.length; i++) els[i].textContent = liveText(+els[i].getAttribute('data-start'), +els[i].getAttribute('data-offset') || 0);
   }
   setInterval(tickClocks, 1000);
 
@@ -685,16 +696,18 @@
       else if (leg && leg.cur) status = 'cur';
       else if (!leg && i < lastIdx) status = 'done';
       var t = leg ? (st.key === 'finish' ? leg.rows[leg.rows.length - 1].raceTime : leg.rows[leg.rows.length - 1].segTime) : '';
+      var tm = status === 'cur' && d.live && d.legStart != null ? liveHtml(d, d.legStart) : (has(t) ? esc(t) : '–');
       h += '<li class="step ' + status + '" style="--sc:' + st.c + '">' +
            '<div class="hd"><span class="ic">' + (status === 'done' ? '✓' : st.icon) + '</span>' + esc(st.label) + '</div>' +
-           '<div class="tm num">' + (has(t) ? esc(t) : '–') + (status === 'cur' ? '<small>onderweg</small>' : '') + '</div></li>';
+           '<div class="tm num">' + tm + (status === 'cur' ? '<small>onderweg</small>' : '') + '</div></li>';
     });
     extras.forEach(function (s) {
       var t = s.data.rows[s.data.rows.length - 1].segTime;
       var isCur = s === last;
+      var tm2 = isCur && d.live && d.legStart != null ? liveHtml(d, d.legStart) : (has(t) ? esc(t) : '–');
       h += '<li class="step ' + (isCur ? 'cur' : 'done') + '" style="--sc:var(--other)">' +
            '<div class="hd"><span class="ic">' + (isCur ? '●' : '✓') + '</span>' + esc(s.data.name) + '</div>' +
-           '<div class="tm num">' + (has(t) ? esc(t) : '–') + '</div></li>';
+           '<div class="tm num">' + tm2 + '</div></li>';
     });
     h += '</ol></div></section>';
 
@@ -735,7 +748,8 @@
       h += '<div class="sec-head"><span class="ic">' + st.icon + '</span><div><h2>' + esc(st.label) + '</h2>' +
            (st.label.toLowerCase() !== s.data.name.toLowerCase() ? '<div class="sub">' + esc(s.data.name) + '</div>' : '') + '</div>';
       if (isCur) h += '<span class="tag">onderweg</span>';
-      if (has(tot)) h += '<span class="tot num">' + esc(tot) + '</span>';
+      if (isCur && d.live && d.legStart != null) h += '<span class="tot num">' + liveHtml(d, d.legStart) + '</span>';
+      else if (has(tot)) h += '<span class="tot num">' + esc(tot) + '</span>';
       h += '</div>';
 
       h += '<div class="scroll"><table><thead><tr>' +
