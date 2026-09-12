@@ -3,202 +3,268 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Max Huisman — Live uitslag</title>
+<title>Almere - Halve Triathlon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:            #f4f5f7;
-    --bg-grad:       radial-gradient(1200px 600px at 50% -10%, #e8ecf5 0%, #f4f5f7 60%);
-    --surface:       #ffffff;
-    --surface-2:     #fafbfc;
-    --border:        #e3e6eb;
-    --border-strong: #d2d7de;
-    --text:          #14171c;
-    --text-2:        #5b6473;
-    --text-3:        #8b94a3;
-    --accent:        #2f6df6;
-    --live:          #18a558;
-    --swim:          #2f8de4;
-    --bike:          #e5892b;
-    --run:           #22a06b;
-    --trans:         #8b7cd8;
-    --finish:        #d8456b;
-    --other:         #6b7684;
-    --shadow:        0 1px 2px rgba(20,23,28,.05), 0 8px 24px -12px rgba(20,23,28,.14);
-    --radius:        14px;
+    --bg:        #eef0f3;
+    --surface:   #ffffff;
+    --surface-2: #f6f7f9;
+    --border:    #e2e5ea;
+    --border-2:  #cfd4dc;
+    --text:      #12161c;
+    --text-2:    #55606f;
+    --text-3:    #8a94a3;
+    --accent:    #2b63e6;
+    --live:      #159a52;
+    --swim:      #1f8ae0;
+    --bike:      #e8871f;
+    --run:       #1ea365;
+    --trans:     #8b7cd8;
+    --finish:    #e0466f;
+    --other:     #6b7684;
+    --hero:      #0c1322;
+    --hero-2:    #142038;
+    --shadow:    0 1px 2px rgba(18,22,28,.05), 0 10px 28px -14px rgba(18,22,28,.18);
+    --r:         16px;
+    --display:   "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    --body:      "Barlow", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg:            #0d1015;
-      --bg-grad:       radial-gradient(1200px 600px at 50% -10%, #171e2b 0%, #0d1015 60%);
-      --surface:       #151a21;
-      --surface-2:     #1a2029;
-      --border:        #252d38;
-      --border-strong: #323c4a;
-      --text:          #eef1f5;
-      --text-2:        #a3adbb;
-      --text-3:        #6f7988;
-      --accent:        #6c9bff;
-      --live:          #35c77b;
-      --swim:          #55a8f0;
-      --bike:          #f0a94c;
-      --run:           #3fc492;
-      --trans:         #a394ec;
-      --finish:        #f0678c;
-      --other:         #8b95a3;
-      --shadow:        0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.6);
+      --bg:        #0a0e15;
+      --surface:   #131923;
+      --surface-2: #171e2a;
+      --border:    #222b38;
+      --border-2:  #2f3a4a;
+      --text:      #eef1f5;
+      --text-2:    #a4aebc;
+      --text-3:    #6d7787;
+      --accent:    #6f9cff;
+      --live:      #36c97c;
+      --swim:      #4fa7f0;
+      --bike:      #f2a24a;
+      --run:       #3fc78f;
+      --trans:     #a698ee;
+      --finish:    #f06a8d;
+      --other:     #8b95a3;
+      --hero:      #070b13;
+      --hero-2:    #0f1828;
+      --shadow:    0 1px 2px rgba(0,0,0,.35), 0 10px 28px -14px rgba(0,0,0,.7);
     }
   }
 
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
   body {
-    margin: 0;
-    background: var(--bg);
-    background-image: var(--bg-grad);
-    background-attachment: fixed;
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
-    font-size: 15px;
-    line-height: 1.5;
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: var(--body); font-size: 15px; line-height: 1.45;
     -webkit-font-smoothing: antialiased;
   }
   .num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
-
-  .wrap { max-width: 1060px; margin: 0 auto; padding: 24px 20px 72px; }
+  .disp { font-family: var(--display); font-weight: 700; letter-spacing: .005em; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 18px 20px 72px; }
+  .stack > * + * { margin-top: 18px; }
 
   /* ---------- top bar ---------- */
-  .topbar {
-    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-    margin-bottom: 20px;
-  }
-  .brand { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--text-3); }
-  .topbar .spacer { flex: 1 1 auto; }
+  .topbar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
+  .brand { line-height: 1.15; }
+  .brand .ev { font-family: var(--display); font-weight: 800; font-size: 22px; text-transform: uppercase; letter-spacing: .01em; }
+  .brand .sub { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
   .live {
     display: inline-flex; align-items: center; gap: 7px;
-    font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
-    color: var(--live);
-    background: color-mix(in srgb, var(--live) 12%, transparent);
-    border: 1px solid color-mix(in srgb, var(--live) 30%, transparent);
+    font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--live); background: color-mix(in srgb, var(--live) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--live) 35%, transparent);
     padding: 4px 10px; border-radius: 999px;
   }
   .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--live); animation: pulse 2s ease-in-out infinite; }
-  @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.82); } }
-  @media (prefers-reduced-motion: reduce) { .dot { animation: none; } }
+  @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .3; transform: scale(.8); } }
+  @media (prefers-reduced-motion: reduce) { .dot, .cur .ic { animation: none !important; } }
+  .spacer { flex: 1 1 auto; }
   .stamp { font-size: 12.5px; color: var(--text-3); }
   .btn {
-    font: inherit; font-size: 13px; font-weight: 600;
-    color: var(--text-2); background: var(--surface); cursor: pointer;
-    border: 1px solid var(--border-strong); border-radius: 9px; padding: 6px 13px;
-    transition: background .15s, color .15s, border-color .15s;
+    font: inherit; font-size: 13px; font-weight: 600; color: var(--text-2);
+    background: var(--surface); cursor: pointer;
+    border: 1px solid var(--border-2); border-radius: 9px; padding: 6px 13px;
+    transition: color .15s, border-color .15s;
+    text-decoration: none; display: inline-flex; align-items: center; line-height: 1.3;
   }
   .btn:hover { color: var(--text); border-color: var(--text-3); }
   .btn:active { transform: translateY(1px); }
   .btn[disabled] { opacity: .55; cursor: default; }
 
+  /* ---------- athlete switcher ---------- */
+  .tabs {
+    display: flex; gap: 4px; padding: 4px; margin-bottom: 18px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 13px; box-shadow: var(--shadow);
+  }
+  .tab {
+    flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 9px 14px; border: 0; border-radius: 9px; background: transparent;
+    color: var(--text-2); font: inherit; font-weight: 600; font-size: 14.5px; cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .tab:hover { color: var(--text); background: var(--surface-2); }
+  .tab .n { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tab .b {
+    font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: .03em; line-height: 1.2;
+    color: var(--text-3); padding: 2px 7px 1px; border-radius: 6px;
+    background: var(--surface-2); border: 1px solid var(--border);
+  }
+  .tab[aria-selected="true"] { background: var(--text); color: var(--bg); }
+  .tab[aria-selected="true"]:hover { background: var(--text); color: var(--bg); }
+  .tab[aria-selected="true"] .b { background: var(--bg); color: var(--text); border-color: transparent; }
+
   /* ---------- cards ---------- */
   .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow: hidden;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r); box-shadow: var(--shadow); overflow: hidden;
   }
-  .card + .card, .stack > * + * { margin-top: 18px; }
 
   /* ---------- hero ---------- */
-  .hero { padding: 26px 26px 22px; }
-  .hero-top { display: flex; align-items: flex-start; gap: 18px; flex-wrap: wrap; }
+  .hero {
+    position: relative; overflow: hidden; border-radius: var(--r);
+    color: #f4f6fa; box-shadow: var(--shadow);
+    background:
+      radial-gradient(760px 380px at 88% -30%, color-mix(in srgb, var(--c) 60%, transparent), transparent 62%),
+      radial-gradient(500px 300px at 0% 110%, color-mix(in srgb, var(--c) 22%, transparent), transparent 60%),
+      repeating-linear-gradient(-58deg, rgba(255,255,255,.028) 0 2px, transparent 2px 16px),
+      linear-gradient(180deg, var(--hero-2), var(--hero));
+  }
+  .hero-in { padding: 28px 30px 26px; }
+  .hero-row { display: flex; align-items: flex-start; gap: 22px; }
+  .eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    color: color-mix(in srgb, var(--c) 78%, #fff);
+  }
   .hero h1 {
-    margin: 0; font-size: clamp(28px, 6vw, 42px); font-weight: 700;
-    letter-spacing: -.025em; line-height: 1.1;
+    margin: 4px 0 6px; font-family: var(--display); font-weight: 800; text-transform: uppercase;
+    font-size: clamp(44px, 9vw, 78px); line-height: .95; letter-spacing: .005em;
   }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px 0; font-size: 14px; color: rgba(244,246,250,.7); }
+  .meta span { white-space: nowrap; }
+  .meta span:not(:last-child)::after { content: "·"; margin: 0 9px; opacity: .45; }
+  .meta b { color: #fff; font-weight: 600; }
   .bib {
-    margin-left: auto; text-align: right; flex: 0 0 auto;
-    padding: 8px 14px; border-radius: 11px;
-    background: var(--surface-2); border: 1px solid var(--border);
+    flex: 0 0 auto; margin-left: auto; text-align: center;
+    background: #fff; color: #0c1322; border-radius: 10px; padding: 8px 16px 6px;
+    box-shadow: 0 6px 20px -8px rgba(0,0,0,.6);
   }
-  .bib .k { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--text-3); }
-  .bib .v { display: block; font-size: 24px; font-weight: 700; letter-spacing: -.02em; line-height: 1.2; }
-  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px; }
-  .chip {
-    font-size: 12.5px; font-weight: 500; color: var(--text-2);
-    background: var(--surface-2); border: 1px solid var(--border);
-    padding: 4px 11px; border-radius: 999px;
+  .bib .k { display: block; font-size: 9.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: #6b7684; }
+  .bib .v { display: block; font-family: var(--display); font-weight: 800; font-size: 40px; line-height: 1; letter-spacing: .01em; }
+
+  /* race strip */
+  .strip {
+    list-style: none; margin: 26px 0 0; padding: 0;
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px;
   }
-  .chip b { color: var(--text); font-weight: 650; }
+  .step {
+    position: relative; padding: 12px 12px 11px; border-radius: 11px;
+    background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.08);
+    min-width: 0;
+  }
+  .step .hd { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(244,246,250,.55); white-space: nowrap; }
+  .step .ic { width: 22px; height: 22px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 12px; background: rgba(255,255,255,.1); flex: 0 0 auto; }
+  .step .tm { margin-top: 6px; font-family: var(--display); font-weight: 700; font-size: 26px; line-height: 1; color: rgba(244,246,250,.35); }
+  .step.done .hd { color: rgba(244,246,250,.8); }
+  .step.done .ic { background: var(--sc); color: #fff; }
+  .step.done .tm { color: #fff; }
+  .step.cur { background: color-mix(in srgb, var(--sc) 22%, rgba(255,255,255,.04)); border-color: color-mix(in srgb, var(--sc) 55%, transparent); }
+  .step.cur .hd { color: #fff; }
+  .step.cur .ic { background: var(--sc); color: #fff; box-shadow: 0 0 0 0 color-mix(in srgb, var(--sc) 60%, transparent); animation: ring 2s ease-out infinite; }
+  @keyframes ring { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--sc) 60%, transparent); } 100% { box-shadow: 0 0 0 9px transparent; } }
+  .step.cur .tm { color: #fff; }
+  .step.cur .tm small, .step .tm small { display: block; font-family: var(--body); font-weight: 600; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; margin-top: 4px; color: color-mix(in srgb, var(--sc) 80%, #fff); }
 
   /* ---------- stat tiles ---------- */
-  .stats {
-    display: grid; gap: 1px; background: var(--border);
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    border-top: 1px solid var(--border);
-  }
-  .stat { background: var(--surface); padding: 16px 18px 15px; }
-  .stat .k { font-size: 10.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--text-3); }
-  .stat .v { font-size: 26px; font-weight: 700; letter-spacing: -.02em; line-height: 1.25; margin-top: 3px; }
-  .stat .s { font-size: 12.5px; color: var(--text-3); margin-top: 1px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 13px; box-shadow: var(--shadow); padding: 14px 16px 13px; }
+  .stat .k { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); }
+  .stat .v { font-family: var(--display); font-weight: 700; font-size: 38px; line-height: 1.05; margin-top: 4px; }
+  .stat .s { font-size: 12.5px; color: var(--text-3); margin-top: 2px; }
+  .stat.hl { border-color: color-mix(in srgb, var(--accent) 35%, var(--border)); }
   .stat.hl .v { color: var(--accent); }
 
   /* ---------- section head ---------- */
-  .sec-head {
-    display: flex; align-items: center; gap: 10px;
-    padding: 15px 20px; border-bottom: 1px solid var(--border);
-    background: var(--surface-2);
-  }
-  .sec-head .icon { font-size: 17px; line-height: 1; }
-  .sec-head h2 {
-    margin: 0; font-size: 13px; font-weight: 700;
-    letter-spacing: .07em; text-transform: uppercase; color: var(--text-2);
-  }
-  .sec-head .tot { margin-left: auto; font-size: 19px; font-weight: 700; letter-spacing: -.02em; }
-  .seg-card { border-left: 3px solid var(--c); }
-  .seg-card .sec-head h2 { color: var(--c); }
-  .seg-card .sec-head .tot { color: var(--c); }
-
-  /* ---------- key/value grid ---------- */
-  .kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0 28px; padding: 6px 20px 14px; }
-  .kv .row { display: flex; gap: 14px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--border); }
-  .kv .row:last-child { border-bottom: 0; }
-  .kv .k { flex: 0 0 42%; font-size: 13px; color: var(--text-3); }
-  .kv .v { font-weight: 600; font-size: 14px; }
+  .sec-head { display: flex; align-items: center; gap: 11px; padding: 13px 18px; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+  .sec-head .ic { width: 28px; height: 28px; border-radius: 8px; display: inline-grid; place-items: center; font-size: 15px; background: color-mix(in srgb, var(--c, var(--text-3)) 16%, transparent); flex: 0 0 auto; }
+  .sec-head h2 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 20px; text-transform: uppercase; letter-spacing: .02em; line-height: 1; }
+  .sec-head .sub { font-size: 12.5px; color: var(--text-3); margin-top: 2px; }
+  .sec-head .tag { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); padding: 3px 8px; border-radius: 999px; }
+  .sec-head .tot { margin-left: auto; font-family: var(--display); font-weight: 700; font-size: 26px; line-height: 1; color: var(--c); }
+  .seg-card .sec-head { border-left: 4px solid var(--c); }
 
   /* ---------- tables ---------- */
   .scroll { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; }
   thead th {
-    font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-    color: var(--text-3); text-align: right; padding: 11px 14px 9px;
+    font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--text-3); text-align: right; padding: 10px 14px 8px;
     border-bottom: 1px solid var(--border); white-space: nowrap;
   }
-  thead th:first-child { text-align: left; padding-left: 20px; }
-  tbody td { padding: 12px 14px; border-bottom: 1px solid var(--border); text-align: right; vertical-align: top; white-space: nowrap; }
-  tbody td:first-child { text-align: left; padding-left: 20px; white-space: normal; }
+  thead th:first-child { text-align: left; padding-left: 18px; }
+  tbody td { padding: 11px 14px; border-bottom: 1px solid var(--border); text-align: right; vertical-align: top; white-space: nowrap; }
+  tbody td:first-child { text-align: left; padding-left: 18px; white-space: normal; }
   tbody tr:last-child td { border-bottom: 0; }
   tbody tr:hover td { background: var(--surface-2); }
-  .loc { font-weight: 650; }
-  .big { font-size: 16px; font-weight: 650; letter-spacing: -.01em; }
-  .sub { font-size: 12px; color: var(--text-3); margin-top: 2px; }
-  .rank { font-size: 12px; color: var(--text-3); margin-top: 3px; }
-  .rank b { color: var(--text-2); font-weight: 650; }
+  tbody tr.latest td { background: color-mix(in srgb, var(--c, var(--accent)) 7%, transparent); }
+  .loc { font-weight: 600; font-size: 15px; }
+  .loc .sub { display: block; font-size: 12px; color: var(--text-3); font-weight: 500; }
+  .big { font-family: var(--display); font-weight: 700; font-size: 24px; line-height: 1; }
+  .spd { font-size: 12px; color: var(--text-2); margin-top: 3px; }
+  .rk { display: inline-flex; gap: 8px; margin-top: 4px; font-size: 12px; color: var(--text-2); }
+  .rk span { display: inline-flex; align-items: baseline; gap: 3px; }
+  .rk b { font-weight: 700; color: var(--text); font-size: 12.5px; }
+  .rk i { font-style: normal; font-size: 9.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
   .muted { color: var(--text-3); font-weight: 400; }
 
-  .legend { padding: 11px 20px; font-size: 12px; color: var(--text-3); background: var(--surface-2); border-top: 1px solid var(--border); }
-
   /* ---------- states ---------- */
-  .msg { padding: 44px 24px; text-align: center; color: var(--text-3); }
-  .msg.err { color: var(--finish); }
-  .msg .t { font-weight: 650; color: var(--text); margin-bottom: 6px; font-size: 16px; }
-  .skel { height: 13px; border-radius: 6px; background: linear-gradient(90deg, var(--border) 25%, var(--surface-2) 50%, var(--border) 75%); background-size: 200% 100%; animation: sh 1.3s linear infinite; }
-  @keyframes sh { to { background-position: -200% 0; } }
+  .msg { padding: 48px 24px; text-align: center; color: var(--text-3); }
+  .msg .t { font-family: var(--display); font-weight: 700; font-size: 24px; color: var(--text); margin-bottom: 4px; }
+  .msg.err .t { color: var(--finish); }
 
-  footer { margin-top: 22px; font-size: 12px; color: var(--text-3); text-align: center; }
+  footer { margin-top: 26px; font-size: 12px; color: var(--text-3); text-align: center; }
   footer a { color: var(--text-3); }
 
+  @media (max-width: 720px) {
+    .strip { grid-template-columns: repeat(3, 1fr); }
+  }
   @media (max-width: 560px) {
-    .wrap { padding: 18px 14px 56px; }
-    .hero { padding: 20px 18px 18px; }
-    .bib { margin-left: 0; }
-    thead th:first-child, tbody td:first-child { padding-left: 16px; }
+    .wrap { padding: 14px 14px 56px; }
+    .hero-in { padding: 20px 18px 18px; }
+    .hero-row { flex-direction: column-reverse; gap: 12px; }
+    .bib { margin-left: 0; align-self: flex-start; padding: 6px 12px 4px; }
+    .bib .v { font-size: 30px; }
+    .step .tm { font-size: 22px; }
+    .stats { gap: 8px; grid-template-columns: repeat(2, 1fr); }
+    .stat .v { font-size: 32px; }
+    thead th:first-child, tbody td:first-child { padding-left: 14px; }
+    .tab { flex-direction: column; padding: 8px 6px 7px; font-size: 13.5px; gap: 4px; }
+    .tab .n { max-width: 100%; }
+    .stats { grid-template-columns: repeat(6, 1fr); }
+    .s-time, .s-last { grid-column: span 3; }
+    .s-rank { grid-column: span 2; order: 2; }
+    .s-last { order: 1; }
+    .s-rank .v { font-size: 28px; }
+  }
+  /* narrow screens: each table row becomes a stacked card */
+  @media (max-width: 640px) {
+    .scroll table, .scroll tbody, .scroll tr { display: block; }
+    .scroll thead { display: none; }
+    .scroll tr { padding: 4px 0 8px; border-bottom: 1px solid var(--border); }
+    .scroll tr:last-child { border-bottom: 0; }
+    .scroll td { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 4px 16px; border: 0; white-space: normal; }
+    .scroll td::before { content: attr(data-l); font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); flex: 0 0 auto; }
+    .scroll td:first-child { padding: 10px 16px 6px; }
+    .scroll td:first-child::before { display: none; }
+    .scroll td .c { text-align: right; min-width: 0; }
+    .scroll td:first-child .c { text-align: left; }
+    .big { font-size: 22px; }
+    .rk { justify-content: flex-end; flex-wrap: wrap; }
   }
 </style>
 </head>
@@ -206,12 +272,18 @@
 
 <div class="wrap">
   <div class="topbar">
-    <span class="brand">Ultimate Live · Event 7420</span>
+    <div class="brand">
+      <div class="ev">Almere - Halve Triathlon</div>
+      <div class="sub">Challenge Almere · 2026</div>
+    </div>
     <span class="live"><span class="dot"></span>Live</span>
     <span class="spacer"></span>
     <span class="stamp" id="stamp"></span>
+    <a class="btn" href="https://live.ultimate.dk/desktop/front/?eventid=7420&amp;ignoreuseragent=true" target="_blank" rel="noopener">UltimateLIVE ↗</a>
     <button class="btn" id="refresh" type="button">Ververs</button>
   </div>
+
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Atleet"></nav>
 
   <div id="app" class="stack">
     <div class="card"><div class="msg"><div class="t">Gegevens laden…</div><div>Even geduld</div></div></div>
@@ -230,10 +302,16 @@
   'use strict';
 
   var ENDPOINT = 'https://live.ultimate.dk/desktop/front/data.php';
-  var PARAMS = { eventid: '7420', mode: 'participantinfo', pid: '2579', language: 'nl' };
+  var PARAMS = { eventid: '7420', mode: 'participantinfo', language: 'nl' };
+  var ATHLETES = [
+    { pid: '2579', name: 'Max Huisman' },
+    { pid: '2580', name: 'Luuk van der Voort' }
+  ];
   var REFRESH_MS = 30000;
+  var LOADING = '<div class="card"><div class="msg"><div class="t">Gegevens laden…</div><div>Even geduld</div></div></div>';
 
   var app = document.getElementById('app');
+  var tabs = document.getElementById('tabs');
   var stamp = document.getElementById('stamp');
   var refreshBtn = document.getElementById('refresh');
   var sink = document.getElementById('PARTICIPANTINFO');
@@ -244,7 +322,6 @@
      ------------------------------------------------------------- */
   function load() {
     return new Promise(function (resolve, reject) {
-      // stubs for the globals the payload touches after the assignment
       window._gaq = window._gaq || { push: function () {} };
       window.details_active = 0;
       window.ajaxprocess = 0;
@@ -256,6 +333,7 @@
 
       var qs = [];
       for (var k in PARAMS) qs.push(k + '=' + encodeURIComponent(PARAMS[k]));
+      qs.push('pid=' + encodeURIComponent(current.pid));
       qs.push('_=' + Date.now());
 
       var s = document.createElement('script');
@@ -276,21 +354,12 @@
   function parse(root) {
     var bigs = [].map.call(root.querySelectorAll('.participant_value_big'), txt);
 
-    // Info groups, walked in document order so each pair lands under its heading.
-    var groups = [], g = null;
-    [].forEach.call(root.querySelectorAll('.participant_section_hdr, td.participant_hdr_small'), function (el) {
-      if (el.className.indexOf('participant_section_hdr') > -1) {
-        g = { title: txt(el), items: [] };
-        groups.push(g);
-        return;
-      }
+    var info = [];
+    [].forEach.call(root.querySelectorAll('td.participant_hdr_small'), function (el) {
       var v = el.nextElementSibling;
-      if (!v) return;
-      if (!g) { g = { title: '', items: [] }; groups.push(g); }
-      g.items.push({ k: txt(el), v: txt(v) });
+      if (v) info.push({ k: txt(el), v: txt(v) });
     });
 
-    // Splits, grouped by segment banner; projections are the 5-column rows.
     var segments = [], cur = null, projections = [], projTitle = '';
     [].forEach.call(root.querySelectorAll('tr'), function (tr) {
       var banner = tr.querySelector('td.split_segment');
@@ -315,28 +384,25 @@
       }
     });
 
-    // the heading directly above the projections block
     var heads = [].map.call(root.querySelectorAll('.participant_section_hdr'), txt);
     if (projections.length && heads.length) projTitle = heads[heads.length - 1];
 
-    // drop headings that carry no key/value pairs (e.g. the projections one)
-    groups = groups.filter(function (x) { return x.items.length; });
-
-    return { name: bigs[0] || '', bib: bigs[1] || '', groups: groups, segments: segments, projections: projections, projTitle: projTitle };
+    return { name: bigs[0] || '', bib: bigs[1] || '', info: info, segments: segments.filter(function (s) { return s.rows.length; }), projections: projections, projTitle: projTitle };
   }
 
-  /* ------------------------------- render ------------------------------ */
-  var THEME = [
-    { re: /swim|zwem/,                          c: 'var(--swim)',   icon: '🏊' },
-    { re: /^t1|^t2|wissel|transition|overgang/, c: 'var(--trans)',  icon: '🔁' },
-    { re: /bike|fiets|cycl|rad/,                c: 'var(--bike)',   icon: '🚴' },
-    { re: /run|loop|lauf/,                      c: 'var(--run)',    icon: '🏃' },
-    { re: /finish|doel/,                        c: 'var(--finish)', icon: '🏁' }
+  /* ------------------------------ helpers ------------------------------ */
+  var STEPS = [
+    { key: 'swim',   label: 'Zwemmen', icon: '🏊', c: 'var(--swim)',   re: /swim|zwem/ },
+    { key: 't1',     label: 'T1',      icon: '⇄',  c: 'var(--trans)',  re: /^t1|wissel ?1|transition ?1/ },
+    { key: 'bike',   label: 'Fietsen', icon: '🚴', c: 'var(--bike)',   re: /bike|fiets|cycl|rad/ },
+    { key: 't2',     label: 'T2',      icon: '⇄',  c: 'var(--trans)',  re: /^t2|wissel ?2|transition ?2/ },
+    { key: 'run',    label: 'Lopen',   icon: '🏃', c: 'var(--run)',    re: /run|loop|lauf/ },
+    { key: 'finish', label: 'Finish',  icon: '🏁', c: 'var(--finish)', re: /finish|doel|aankomst/ }
   ];
-  function theme(name) {
+  function stepOf(name) {
     var n = (name || '').toLowerCase();
-    for (var i = 0; i < THEME.length; i++) if (THEME[i].re.test(n)) return THEME[i];
-    return { c: 'var(--other)', icon: '●' };
+    for (var i = 0; i < STEPS.length; i++) if (STEPS[i].re.test(n)) return STEPS[i];
+    return null;
   }
 
   function esc(s) {
@@ -347,105 +413,172 @@
   function has(v) { return v && v !== '-' && v !== '--'; }
   function val(v) { return has(v) ? esc(v) : '<span class="muted">–</span>'; }
 
-  function rankLine(r) {
+  function toSecs(t) {
+    if (!has(t)) return null;
+    var p = t.split(':').map(Number);
+    if (p.some(isNaN)) return null;
+    while (p.length < 3) p.unshift(0);
+    return p[0] * 3600 + p[1] * 60 + p[2];
+  }
+  // clock time in the race's own timezone, so "x min geleden" is right anywhere
+  function nowSecsNL() {
+    try {
+      var parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Amsterdam', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).formatToParts(new Date());
+      var o = {};
+      parts.forEach(function (p) { o[p.type] = Number(p.value); });
+      return (o.hour % 24) * 3600 + o.minute * 60 + o.second;
+    } catch (e) { return null; }
+  }
+  function ago(clock) {
+    var a = toSecs(clock), b = nowSecsNL();
+    if (a == null || b == null) return '';
+    var d = b - a;
+    if (d < 0 || d > 12 * 3600) return '';
+    if (d < 60) return 'zojuist';
+    if (d < 3600) return Math.floor(d / 60) + ' min geleden';
+    return Math.floor(d / 3600) + ' u ' + Math.floor((d % 3600) / 60) + ' min geleden';
+  }
+
+  function ranks(r) {
     if (!r || !has(r[0])) return '';
-    var parts = [];
-    if (has(r[0])) parts.push('<b>' + esc(r[0]) + '</b>');
-    if (has(r[1])) parts.push('<b>' + esc(r[1]) + '</b>');
-    if (has(r[2])) parts.push('<b>' + esc(r[2]) + '</b>');
-    return '<div class="rank num">' + parts.join(' <span class="muted">·</span> ') + '</div>';
+    var lbl = ['alg', 'gesl', 'cat'], out = [];
+    for (var i = 0; i < 3; i++) if (has(r[i])) out.push('<span><b class="num">' + esc(r[i]) + '</b><i>' + lbl[i] + '</i></span>');
+    return '<div class="rk">' + out.join('') + '</div>';
   }
-
   function cell(time, speed, rank) {
-    var h = '<div class="big num">' + val(time) + '</div>';
-    if (has(speed)) h += '<div class="sub num">' + esc(speed) + '</div>';
-    h += rankLine(rank);
-    return h;
+    var h = '<div class="c"><div class="big num">' + val(time) + '</div>';
+    if (has(speed)) h += '<div class="spd num">' + esc(speed) + '</div>';
+    h += ranks(rank);
+    return h + '</div>';
   }
+  function td(label, inner) { return '<td data-l="' + label + '">' + inner + '</td>'; }
+  function plain(v) { return '<div class="c"><div class="big num">' + val(v) + '</div></div>'; }
 
+  /* ------------------------------- render ------------------------------ */
   function render(d) {
     var h = '';
 
-    /* hero + stat tiles */
-    var flat = [];
-    d.segments.forEach(function (s) { s.rows.forEach(function (r) { flat.push(r); }); });
-    var last = flat[flat.length - 1];
+    // classify segments and find where the athlete is
+    var segs = d.segments.map(function (s) { return { data: s, step: stepOf(s.name) }; });
+    var last = segs.length ? segs[segs.length - 1] : null;
+    var lastRow = last ? last.data.rows[last.data.rows.length - 1] : null;
+    var curStep = last && last.step ? last.step : { c: 'var(--accent)', label: '', icon: '' };
+    var finished = !!(last && last.step && last.step.key === 'finish');
 
-    h += '<div class="card">';
-    h += '<div class="hero"><div class="hero-top"><h1>' + esc(d.name || 'Deelnemer') + '</h1>';
+    /* ---- hero ---- */
+    var eyebrow = [], meta = [];
+    d.info.forEach(function (it) {
+      if (/afstand|distance|categorie|category/i.test(it.k)) eyebrow.push(it.v);
+      else meta.push('<span>' + esc(it.k) + ' <b>' + esc(it.v) + '</b></span>');
+    });
+
+    h += '<section class="hero" style="--c:' + curStep.c + '"><div class="hero-in">';
+    h += '<div class="hero-row"><div>';
+    if (eyebrow.length) h += '<div class="eyebrow">' + esc(eyebrow.join(' · ')) + '</div>';
+    h += '<h1>' + esc(d.name || 'Deelnemer') + '</h1>';
+    if (meta.length) h += '<div class="meta">' + meta.join('') + '</div>';
+    h += '</div>';
     if (d.bib) h += '<div class="bib"><span class="k">Startnr</span><span class="v num">' + esc(d.bib) + '</span></div>';
     h += '</div>';
 
-    var chips = [];
-    d.groups.forEach(function (g) {
-      g.items.forEach(function (it) {
-        chips.push('<span class="chip">' + esc(it.k) + ' <b>' + esc(it.v) + '</b></span>');
-      });
-    });
-    if (chips.length) h += '<div class="chips">' + chips.join('') + '</div>';
-    h += '</div>';
+    // race strip: canonical order, merged with whatever the feed has
+    var lastIdx = last && last.step ? STEPS.indexOf(last.step) : -1;
+    var byKey = {};
+    segs.forEach(function (s) { if (s.step) byKey[s.step.key] = s.data; });
+    var extras = segs.filter(function (s) { return !s.step; });
 
-    if (last) {
+    h += '<ol class="strip">';
+    STEPS.forEach(function (st, i) {
+      var data = byKey[st.key];
+      var status = 'todo';
+      if (data && (i < lastIdx || finished)) status = 'done';
+      else if (data && i === lastIdx) status = 'cur';
+      else if (!data && i < lastIdx) status = 'done';
+      var t = data ? (st.key === 'finish' ? data.rows[data.rows.length - 1].raceTime : data.rows[data.rows.length - 1].segTime) : '';
+      h += '<li class="step ' + status + '" style="--sc:' + st.c + '">' +
+           '<div class="hd"><span class="ic">' + (status === 'done' ? '✓' : st.icon) + '</span>' + esc(st.label) + '</div>' +
+           '<div class="tm num">' + (has(t) ? esc(t) : '–') + (status === 'cur' ? '<small>onderweg</small>' : '') + '</div></li>';
+    });
+    extras.forEach(function (s) {
+      var t = s.data.rows[s.data.rows.length - 1].segTime;
+      var isCur = s === last;
+      h += '<li class="step ' + (isCur ? 'cur' : 'done') + '" style="--sc:var(--other)">' +
+           '<div class="hd"><span class="ic">' + (isCur ? '●' : '✓') + '</span>' + esc(s.data.name) + '</div>' +
+           '<div class="tm num">' + (has(t) ? esc(t) : '–') + '</div></li>';
+    });
+    h += '</ol></div></section>';
+
+    /* ---- stat tiles ---- */
+    if (lastRow) {
+      // rankings can lag a checkpoint behind the times; use the latest row that has them
+      var ranked = null;
+      for (var si = segs.length - 1; si >= 0 && !ranked; si--) {
+        var rr = segs[si].data.rows;
+        for (var ri = rr.length - 1; ri >= 0; ri--) if (has(rr[ri].raceRank[0])) { ranked = rr[ri]; break; }
+      }
+      var rk = ranked ? ranked.raceRank : ['', '', ''];
+      var rkAt = ranked && ranked !== lastRow ? ' bij ' + esc(ranked.loc) : '';
+      var when = ago(lastRow.clock);
       h += '<div class="stats">';
-      h += '<div class="stat hl"><div class="k">Racetijd</div><div class="v num">' + val(last.raceTime) + '</div><div class="s">' + esc(last.loc) + '</div></div>';
-      h += '<div class="stat"><div class="k">Totaal</div><div class="v num">' + val(last.raceRank[0]) + '</div><div class="s">plaats algemeen</div></div>';
-      h += '<div class="stat"><div class="k">Geslacht</div><div class="v num">' + val(last.raceRank[1]) + '</div><div class="s">plaats in geslacht</div></div>';
-      h += '<div class="stat"><div class="k">Categorie</div><div class="v num">' + val(last.raceRank[2]) + '</div><div class="s">plaats in categorie</div></div>';
-      h += '<div class="stat"><div class="k">Laatste passage</div><div class="v num">' + val(last.clock) + '</div><div class="s">tijdstip</div></div>';
+      h += '<div class="stat hl s-time"><div class="k">Racetijd</div><div class="v num">' + val(lastRow.raceTime) + '</div><div class="s">bij ' + esc(lastRow.loc) + '</div></div>';
+      h += '<div class="stat s-rank"><div class="k">Algemeen</div><div class="v num">' + val(rk[0]) + '</div><div class="s">plaats totaal' + rkAt + '</div></div>';
+      h += '<div class="stat s-rank"><div class="k">Geslacht</div><div class="v num">' + val(rk[1]) + '</div><div class="s">in geslacht' + rkAt + '</div></div>';
+      h += '<div class="stat s-rank"><div class="k">Categorie</div><div class="v num">' + val(rk[2]) + '</div><div class="s">in categorie' + rkAt + '</div></div>';
+      h += '<div class="stat s-last"><div class="k">Laatste passage</div><div class="v num">' + val(lastRow.clock) + '</div><div class="s">' + (when ? esc(when) : 'tijdstip') + '</div></div>';
       h += '</div>';
     }
-    h += '</div>';
 
-    /* segment cards */
-    d.segments.forEach(function (s) {
-      if (!s.rows.length) return;
-      var t = theme(s.name);
-      var tot = s.rows[s.rows.length - 1].segTime;
+    /* ---- segment cards ---- */
+    segs.forEach(function (s) {
+      var st = s.step || { c: 'var(--other)', label: s.data.name, icon: '●' };
+      var rows = s.data.rows;
+      var tot = st.key === 'finish' ? rows[rows.length - 1].raceTime : rows[rows.length - 1].segTime;
+      var isCur = s === last && !finished;
 
-      h += '<div class="card seg-card" style="--c:' + t.c + '">';
-      h += '<div class="sec-head"><span class="icon">' + t.icon + '</span><h2>' + esc(s.name) + '</h2>';
+      h += '<div class="card seg-card" style="--c:' + st.c + '">';
+      h += '<div class="sec-head"><span class="ic">' + st.icon + '</span><div><h2>' + esc(st.label) + '</h2>' +
+           (st.label.toLowerCase() !== s.data.name.toLowerCase() ? '<div class="sub">' + esc(s.data.name) + '</div>' : '') + '</div>';
+      if (isCur) h += '<span class="tag">onderweg</span>';
       if (has(tot)) h += '<span class="tot num">' + esc(tot) + '</span>';
       h += '</div>';
 
       h += '<div class="scroll"><table><thead><tr>' +
-           '<th>Lokatie</th><th>Racetijd</th><th>Segment</th><th>Ronde</th><th>Tijdstip</th>' +
+           '<th>Meetpunt</th><th>Racetijd</th><th>Segment</th><th>Ronde</th><th>Tijdstip</th>' +
            '</tr></thead><tbody>';
-
-      s.rows.forEach(function (r) {
-        h += '<tr>' +
-             '<td><div class="loc">' + esc(r.loc) + '</div></td>' +
-             '<td>' + cell(r.raceTime, null, r.raceRank) + '</td>' +
-             '<td>' + cell(r.segTime, r.segSpeed, r.segRank) + '</td>' +
-             '<td>' + cell(r.lapTime, r.lapSpeed, r.lapRank) + '</td>' +
-             '<td><div class="big num">' + val(r.clock) + '</div></td>' +
+      rows.forEach(function (r, i) {
+        var latest = isCur && i === rows.length - 1;
+        h += '<tr' + (latest ? ' class="latest"' : '') + '>' +
+             td('Meetpunt', '<div class="c"><div class="loc">' + esc(r.loc) + (latest ? '<span class="sub">laatste doorkomst</span>' : '') + '</div></div>') +
+             td('Racetijd', cell(r.raceTime, null, r.raceRank)) +
+             td('Segment', cell(r.segTime, r.segSpeed, r.segRank)) +
+             td('Ronde', cell(r.lapTime, r.lapSpeed, r.lapRank)) +
+             td('Tijdstip', plain(r.clock)) +
              '</tr>';
       });
-
-      h += '</tbody></table></div>';
-      h += '<div class="legend">Plaatsen onder elke tijd: <b>totaal</b> · <b>geslacht</b> · <b>categorie</b></div>';
-      h += '</div>';
+      h += '</tbody></table></div></div>';
     });
 
-    /* projections */
+    /* ---- projections ---- */
     if (d.projections.length) {
-      h += '<div class="card">';
-      h += '<div class="sec-head"><span class="icon">📈</span><h2>' + esc(d.projTitle || 'Geschatte tijden') + '</h2></div>';
+      h += '<div class="card" style="--c:var(--text-3)">';
+      h += '<div class="sec-head"><span class="ic">📈</span><div><h2>Verwachte doorkomsten</h2>' +
+           (d.projTitle ? '<div class="sub">' + esc(d.projTitle) + '</div>' : '') + '</div></div>';
       h += '<div class="scroll"><table><thead><tr>' +
-           '<th>Lokatie</th><th>Racetijd</th><th>Segment</th><th>Ronde</th><th>Tijdstip</th>' +
+           '<th>Meetpunt</th><th>Racetijd</th><th>Segment</th><th>Ronde</th><th>Tijdstip</th>' +
            '</tr></thead><tbody>';
       d.projections.forEach(function (p) {
         h += '<tr>' +
-             '<td><div class="loc">' + esc(p.loc) + '</div></td>' +
-             '<td><div class="big num">' + val(p.raceTime) + '</div></td>' +
-             '<td><div class="big num">' + val(p.segTime) + '</div></td>' +
-             '<td><div class="big num">' + val(p.lapTime) + '</div></td>' +
-             '<td><div class="big num">' + val(p.clock) + '</div></td>' +
+             td('Meetpunt', '<div class="c"><div class="loc">' + esc(p.loc) + '</div></div>') +
+             td('Racetijd', plain(p.raceTime)) +
+             td('Segment', plain(p.segTime)) +
+             td('Ronde', plain(p.lapTime)) +
+             td('Tijdstip', plain(p.clock)) +
              '</tr>';
       });
       h += '</tbody></table></div></div>';
     }
 
-    if (!d.segments.length && !d.projections.length) {
+    if (!segs.length && !d.projections.length) {
       h += '<div class="card"><div class="msg"><div class="t">Nog geen tussentijden</div>' +
            '<div>Zodra de deelnemer een meetpunt passeert verschijnen de tijden hier.</div></div></div>';
     }
@@ -453,22 +586,63 @@
     app.innerHTML = h;
   }
 
+  /* ---------------------------- athlete switch ---------------------------- */
+  var current = ATHLETES[0];
+  var seq = 0; // ignore responses that arrive after a newer request started
+
+  function findAthlete(pid) {
+    for (var i = 0; i < ATHLETES.length; i++) if (ATHLETES[i].pid === pid) return ATHLETES[i];
+    return null;
+  }
+  function initialAthlete() {
+    var fromHash = findAthlete(location.hash.replace('#', ''));
+    if (fromHash) return fromHash;
+    try { var saved = findAthlete(localStorage.getItem('pid')); if (saved) return saved; } catch (e) {}
+    return ATHLETES[0];
+  }
+  function renderTabs() {
+    tabs.innerHTML = ATHLETES.map(function (a) {
+      return '<button class="tab" role="tab" type="button" data-pid="' + a.pid + '" aria-selected="' + (a === current) + '">' +
+             '<span class="n">' + esc(a.name) + '</span><span class="b num">' + esc(a.pid) + '</span></button>';
+    }).join('');
+  }
+  function select(a) {
+    if (!a || a === current) return;
+    current = a;
+    try { localStorage.setItem('pid', a.pid); } catch (e) {}
+    if (location.hash !== '#' + a.pid) history.replaceState(null, '', '#' + a.pid);
+    renderTabs();
+    app.innerHTML = LOADING;
+    stamp.textContent = '';
+    tick();
+  }
+  tabs.addEventListener('click', function (e) {
+    var b = e.target.closest('.tab');
+    if (b) select(findAthlete(b.getAttribute('data-pid')));
+  });
+  window.addEventListener('hashchange', function () { select(findAthlete(location.hash.replace('#', ''))); });
+
   /* ------------------------------- cycle ------------------------------- */
   function tick() {
+    var mine = ++seq;
     refreshBtn.disabled = true;
     return load()
       .then(function (root) {
+        if (mine !== seq) return;
         render(parse(root));
         stamp.textContent = 'bijgewerkt ' + new Date().toLocaleTimeString('nl-NL');
       })
       .catch(function (e) {
+        if (mine !== seq) return;
         app.innerHTML = '<div class="card"><div class="msg err"><div class="t">Laden mislukt</div><div>' +
           esc(e.message) + '</div></div></div>';
         stamp.textContent = '';
       })
-      .then(function () { refreshBtn.disabled = false; });
+      .then(function () { if (mine === seq) refreshBtn.disabled = false; });
   }
 
+  current = initialAthlete();
+  renderTabs();
   refreshBtn.addEventListener('click', tick);
   tick();
   setInterval(tick, REFRESH_MS);
