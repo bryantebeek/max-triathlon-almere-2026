@@ -115,8 +115,6 @@
     color: var(--text-3); padding: 2px 7px 1px; border-radius: 6px;
     background: var(--surface-2); border: 1px solid var(--border);
   }
-  .tab .t { font-family: var(--display); font-weight: 700; font-size: 19px; line-height: 1; letter-spacing: .01em; color: var(--text-2); margin-left: 2px; }
-  .tab[aria-selected="true"] .t { color: var(--bg); }
   .tab[aria-selected="true"] { background: var(--text); color: var(--bg); }
   .tab[aria-selected="true"]:hover { background: var(--text); color: var(--bg); }
   .tab[aria-selected="true"] .b { background: var(--bg); color: var(--text); border-color: transparent; }
@@ -270,9 +268,8 @@
     .stats { gap: 8px; grid-template-columns: repeat(2, 1fr); }
     .stat .v { font-size: 32px; }
     thead th:first-child, tbody td:first-child { padding-left: 14px; }
-    .tab { flex-wrap: wrap; padding: 8px 6px 7px; font-size: 13.5px; gap: 4px 8px; }
-    .tab .n { flex: 0 0 100%; text-align: center; }
-    .tab .t { font-size: 18px; margin-left: 0; }
+    .tab { flex-direction: column; padding: 8px 6px 7px; font-size: 13.5px; gap: 4px; }
+    .tab .n { max-width: 100%; }
     .stats { grid-template-columns: repeat(6, 1fr); }
     .s-time, .s-last { grid-column: span 3; }
     .s-rank { grid-column: span 2; order: 2; }
@@ -811,25 +808,11 @@
     try { var saved = findAthlete(localStorage.getItem('pid')); if (saved) return saved; } catch (e) {}
     return ATHLETES[0];
   }
-  function tabTime(a) {
-    var c = cache[a.pid], d = c && c.data;
-    if (!d) return '–';
-    if (d.live) return liveHtml(d);
-    return d.lastRow && has(d.lastRow.raceTime) ? esc(d.lastRow.raceTime) : '–';
-  }
   function renderTabs() {
     tabs.innerHTML = ATHLETES.map(function (a) {
       return '<button class="tab" role="tab" type="button" data-pid="' + a.pid + '" aria-selected="' + (a === current) + '">' +
-             '<span class="n">' + esc(a.name) + '</span><span class="b num">' + esc(a.pid) + '</span>' +
-             '<span class="t num">' + tabTime(a) + '</span></button>';
+             '<span class="n">' + esc(a.name) + '</span><span class="b num">' + esc(a.pid) + '</span></button>';
     }).join('');
-  }
-  // refresh the times in place so a tap mid-refresh isn't interrupted by a rebuild
-  function updateTabTimes() {
-    ATHLETES.forEach(function (a) {
-      var el = tabs.querySelector('.tab[data-pid="' + a.pid + '"] .t');
-      if (el) el.innerHTML = tabTime(a);
-    });
   }
   function select(a) {
     if (!a || a === current) return;
@@ -866,7 +849,6 @@
         }).then(function () {
           if (mine !== seq) return;
           render();
-          updateTabTimes();
           stamp.textContent = 'bijgewerkt ' + new Date().toLocaleTimeString('nl-NL');
         });
       });
