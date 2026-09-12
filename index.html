@@ -222,6 +222,30 @@
   .rk i { font-style: normal; font-size: 9.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
   .muted { color: var(--text-3); font-weight: 400; }
 
+  /* ---------- head-to-head ---------- */
+  .h2h .lead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 16px 18px 14px; border-bottom: 1px solid var(--border); }
+  .h2h .lead .who { font-family: var(--display); font-weight: 800; font-size: 26px; text-transform: uppercase; letter-spacing: .01em; line-height: 1; }
+  .h2h .lead .gap { font-family: var(--display); font-weight: 800; font-size: 34px; line-height: 1; color: var(--accent); }
+  .h2h .lead .at { font-size: 13px; color: var(--text-3); }
+  .cmp { display: grid; grid-template-columns: 1.15fr 1fr 1fr 1.2fr; }
+  .cmp > div { display: flex; flex-direction: column; justify-content: center; padding: 10px 14px; border-bottom: 1px solid var(--border); min-width: 0; }
+  .cmp > div:nth-child(4n+1) { padding-left: 18px; }
+  .cmp > div:nth-last-child(-n+4) { border-bottom: 0; }
+  .cmp .hd { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); text-align: right; padding-top: 12px; padding-bottom: 8px; background: var(--surface-2); }
+  .cmp .hd.ath { flex-direction: row; justify-content: flex-end; align-items: center; gap: 7px; text-transform: none; letter-spacing: 0; font-size: 13.5px; font-weight: 700; color: var(--text); }
+  .cmp .hd.ath .n { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cmp .hd.ath .b { font-family: var(--display); font-size: 13px; letter-spacing: .03em; color: var(--text-3); padding: 1px 6px; border-radius: 5px; background: var(--surface); border: 1px solid var(--border); }
+  .cmp .lg { flex-direction: row; align-items: center; gap: 9px; font-weight: 600; font-size: 14px; }
+  .cmp .hd.ath .n.short { display: none; }
+  .cmp .dotc { width: 24px; height: 24px; border-radius: 7px; display: inline-grid; place-items: center; font-size: 12.5px; background: color-mix(in srgb, var(--sc) 16%, transparent); flex: 0 0 auto; }
+  .cmp .tv { text-align: right; font-family: var(--display); font-weight: 700; font-size: 24px; line-height: 1; color: var(--text-2); }
+  .cmp .tv.win { color: var(--text); }
+  .cmp .tv.lose { color: var(--text-3); }
+  .cmp .tv small { display: block; font-family: var(--body); font-weight: 500; font-size: 11.5px; color: var(--text-3); margin-top: 4px; line-height: 1.2; }
+  .cmp .df { text-align: right; font-size: 13px; color: var(--text-2); line-height: 1.3; }
+  .cmp .df b { color: var(--text); }
+  .cmp .df small { display: block; font-size: 11.5px; color: var(--text-3); }
+
   /* ---------- states ---------- */
   .msg { padding: 48px 24px; text-align: center; color: var(--text-3); }
   .msg .t { font-family: var(--display); font-weight: 700; font-size: 24px; color: var(--text); margin-bottom: 4px; }
@@ -265,6 +289,19 @@
     .scroll td:first-child .c { text-align: left; }
     .big { font-size: 22px; }
     .rk { justify-content: flex-end; flex-wrap: wrap; }
+    .cmp { grid-template-columns: 1fr 1fr 1fr; }
+    .cmp > div { padding: 9px 10px; border-bottom: 0; }
+    .cmp > div:nth-child(4n+1) { padding-left: 14px; }
+    .cmp .hd.df { display: none; }
+    .cmp .df { grid-column: 1 / -1; padding-top: 0; padding-bottom: 9px; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+    .cmp .df:empty { padding: 0 0 6px; }
+    .cmp > div:nth-last-child(-n+4) { border-bottom: 0; }
+    .cmp .lg { font-size: 13px; gap: 6px; }
+    .cmp .hd.ath .n.full { display: none; }
+    .cmp .hd.ath .n.short { display: inline; }
+    .cmp .tv { font-size: 21px; }
+    .h2h .lead .who { font-size: 22px; }
+    .h2h .lead .gap { font-size: 28px; }
   }
 </style>
 </head>
@@ -319,8 +356,9 @@
   /* -------------------------------------------------------------
      Load. The endpoint has no CORS headers, but it is a plain JS
      file that assigns innerHTML — so a <script> tag loads it fine.
+     The sink is shared, so athletes are fetched one after another.
      ------------------------------------------------------------- */
-  function load() {
+  function load(pid) {
     return new Promise(function (resolve, reject) {
       window._gaq = window._gaq || { push: function () {} };
       window.details_active = 0;
@@ -333,7 +371,7 @@
 
       var qs = [];
       for (var k in PARAMS) qs.push(k + '=' + encodeURIComponent(PARAMS[k]));
-      qs.push('pid=' + encodeURIComponent(current.pid));
+      qs.push('pid=' + encodeURIComponent(pid));
       qs.push('_=' + Date.now());
 
       var s = document.createElement('script');
@@ -387,7 +425,9 @@
     var heads = [].map.call(root.querySelectorAll('.participant_section_hdr'), txt);
     if (projections.length && heads.length) projTitle = heads[heads.length - 1];
 
-    return { name: bigs[0] || '', bib: bigs[1] || '', info: info, segments: segments.filter(function (s) { return s.rows.length; }), projections: projections, projTitle: projTitle };
+    var d = { name: bigs[0] || '', bib: bigs[1] || '', info: info, segments: segments.filter(function (s) { return s.rows.length; }), projections: projections, projTitle: projTitle };
+    classify(d);
+    return d;
   }
 
   /* ------------------------------ helpers ------------------------------ */
@@ -405,6 +445,27 @@
     return null;
   }
 
+  // Annotate parsed data with where the athlete is on the course.
+  function classify(d) {
+    d.segs = d.segments.map(function (s) { return { data: s, step: stepOf(s.name) }; });
+    d.last = d.segs.length ? d.segs[d.segs.length - 1] : null;
+    d.lastRow = d.last ? d.last.data.rows[d.last.data.rows.length - 1] : null;
+    d.finished = !!(d.last && d.last.step && d.last.step.key === 'finish');
+    d.lastIdx = d.last && d.last.step ? STEPS.indexOf(d.last.step) : -1;
+    d.legs = {};
+    d.segs.forEach(function (s) {
+      if (!s.step) return;
+      var i = STEPS.indexOf(s.step);
+      d.legs[s.step.key] = { rows: s.data.rows, done: i < d.lastIdx || d.finished, cur: i === d.lastIdx && !d.finished };
+    });
+    // rankings can lag a checkpoint behind the times; remember the latest row that has them
+    d.ranked = null;
+    for (var si = d.segs.length - 1; si >= 0 && !d.ranked; si--) {
+      var rr = d.segs[si].data.rows;
+      for (var ri = rr.length - 1; ri >= 0; ri--) if (has(rr[ri].raceRank[0])) { d.ranked = rr[ri]; break; }
+    }
+  }
+
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
@@ -412,6 +473,7 @@
   }
   function has(v) { return v && v !== '-' && v !== '--'; }
   function val(v) { return has(v) ? esc(v) : '<span class="muted">–</span>'; }
+  function first(name) { return (name || '').split(' ')[0]; }
 
   function toSecs(t) {
     if (!has(t)) return null;
@@ -419,6 +481,12 @@
     if (p.some(isNaN)) return null;
     while (p.length < 3) p.unshift(0);
     return p[0] * 3600 + p[1] * 60 + p[2];
+  }
+  function fmtSecs(s) {
+    s = Math.round(Math.abs(s));
+    var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+    var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+    return h ? h + ':' + pad(m) + ':' + pad(sec) : m + ':' + pad(sec);
   }
   // clock time in the race's own timezone, so "x min geleden" is right anywhere
   function nowSecsNL() {
@@ -454,16 +522,109 @@
   function td(label, inner) { return '<td data-l="' + label + '">' + inner + '</td>'; }
   function plain(v) { return '<div class="c"><div class="big num">' + val(v) + '</div></div>'; }
 
-  /* ------------------------------- render ------------------------------ */
-  function render(d) {
-    var h = '';
+  /* ---------------------------- head-to-head --------------------------- */
+  // Latest checkpoint both athletes have passed, searched from the end of the course back.
+  function commonCheckpoint(a, b) {
+    for (var i = STEPS.length - 1; i >= 0; i--) {
+      var la = a.legs[STEPS[i].key], lb = b.legs[STEPS[i].key];
+      if (!la || !lb) continue;
+      for (var x = la.rows.length - 1; x >= 0; x--) {
+        for (var y = lb.rows.length - 1; y >= 0; y--) {
+          if (la.rows[x].loc === lb.rows[y].loc) return { step: STEPS[i], a: la.rows[x], b: lb.rows[y] };
+        }
+      }
+    }
+    return null;
+  }
 
-    // classify segments and find where the athlete is
-    var segs = d.segments.map(function (s) { return { data: s, step: stepOf(s.name) }; });
-    var last = segs.length ? segs[segs.length - 1] : null;
-    var lastRow = last ? last.data.rows[last.data.rows.length - 1] : null;
+  function h2hCard(A, B) {
+    var a = A.data, b = B.data;
+    if (!a || !b) return '';
+    var h = '<div class="card h2h" style="--c:var(--accent)">';
+    h += '<div class="sec-head"><span class="ic">⚔️</span><div><h2>Head-to-head</h2>' +
+         '<div class="sub">verschil op netto racetijd, gemeten bij het laatste meetpunt dat beiden passeerden</div></div></div>';
+
+    // headline gap
+    var cp = commonCheckpoint(a, b);
+    h += '<div class="lead">';
+    if (cp) {
+      var ta = toSecs(cp.a.raceTime), tb = toSecs(cp.b.raceTime);
+      if (ta != null && tb != null && ta !== tb) {
+        var lead = ta < tb ? A : B;
+        h += '<span class="who">' + esc(lead.name) + '</span><span class="gap num">' + fmtSecs(ta - tb) + '</span><span class="at">voor · bij ' + esc(cp.a.loc) + '</span>';
+      } else {
+        h += '<span class="who">Gelijk</span><span class="at">bij ' + esc(cp.a.loc) + '</span>';
+      }
+    } else {
+      h += '<span class="who">Nog geen gemeenschappelijk meetpunt</span>';
+    }
+    h += '</div>';
+
+    // grid
+    var nameCell = function (x) { return '<div class="hd ath"><span class="n full">' + esc(x.name) + '</span><span class="n short">' + esc(first(x.name)) + '</span><span class="b num">' + esc(x.pid) + '</span></div>'; };
+    h += '<div class="cmp">';
+    h += '<div class="hd"></div>' + nameCell(A) + nameCell(B) + '<div class="hd df">verschil</div>';
+
+    var row = function (label, icon, color, va, vb, sa, sb, dSecs, dAt) {
+      var win = dSecs == null ? 0 : (dSecs < 0 ? -1 : dSecs > 0 ? 1 : 0); // -1: A faster, 1: B faster
+      h += '<div class="lg"><span class="dotc" style="--sc:' + color + '">' + icon + '</span>' + esc(label) + '</div>';
+      h += '<div class="tv num' + (win === -1 ? ' win' : win === 1 ? ' lose' : '') + '">' + val(va) + (sa ? '<small>' + sa + '</small>' : '') + '</div>';
+      h += '<div class="tv num' + (win === 1 ? ' win' : win === -1 ? ' lose' : '') + '">' + val(vb) + (sb ? '<small>' + sb + '</small>' : '') + '</div>';
+      h += '<div class="df">';
+      if (win) h += '<span><b>' + esc(first(win === -1 ? A.name : B.name)) + '</b> ' + fmtSecs(dSecs) + ' sneller' + (dAt ? '<small>bij ' + esc(dAt) + '</small>' : '') + '</span>';
+      else if (dSecs === 0) h += '<span>gelijk</span>';
+      h += '</div>';
+    };
+
+    // current state
+    var ra = a.lastRow, rb = b.lastRow;
+    row('Racetijd', '⏱', 'var(--text-3)',
+        ra && ra.raceTime, rb && rb.raceTime,
+        ra ? 'bij ' + esc(ra.loc) : '', rb ? 'bij ' + esc(rb.loc) : '', null, '');
+    row('Plaats algemeen', '#', 'var(--text-3)',
+        a.ranked && a.ranked.raceRank[0], b.ranked && b.ranked.raceRank[0],
+        a.ranked && a.ranked !== ra ? 'bij ' + esc(a.ranked.loc) : '', b.ranked && b.ranked !== rb ? 'bij ' + esc(b.ranked.loc) : '', null, '');
+
+    // per leg
+    STEPS.forEach(function (st) {
+      var la = a.legs[st.key], lb = b.legs[st.key];
+      var ta = la ? la.rows[la.rows.length - 1] : null, tb = lb ? lb.rows[lb.rows.length - 1] : null;
+      var pick = function (r) { return r ? (st.key === 'finish' ? r.raceTime : r.segTime) : ''; };
+      var va = pick(ta), vb = pick(tb);
+      var sa = la && la.cur ? 'onderweg' : '', sb = lb && lb.cur ? 'onderweg' : '';
+      var d = null, at = '';
+      if (la && lb && la.done && lb.done) {
+        var x = toSecs(va), y = toSecs(vb);
+        if (x != null && y != null) d = x - y;
+      } else if (la && lb) {
+        // both have splits in this leg but at least one is still in it: compare at the last shared checkpoint
+        outer: for (var i = la.rows.length - 1; i >= 0; i--) for (var j = lb.rows.length - 1; j >= 0; j--) {
+          if (la.rows[i].loc === lb.rows[j].loc) {
+            var x2 = toSecs(la.rows[i].segTime), y2 = toSecs(lb.rows[j].segTime);
+            if (x2 != null && y2 != null) { d = x2 - y2; at = la.rows[i].loc; }
+            break outer;
+          }
+        }
+      }
+      row(st.label, st.icon, st.c, va, vb, sa, sb, d, at);
+    });
+
+    h += '</div></div>';
+    return h;
+  }
+
+  /* ------------------------------- render ------------------------------ */
+  function render() {
+    var me = cache[current.pid];
+    if (!me || !me.data) {
+      app.innerHTML = me && me.err
+        ? '<div class="card"><div class="msg err"><div class="t">Laden mislukt</div><div>' + esc(me.err.message) + '</div></div></div>'
+        : LOADING;
+      return;
+    }
+    var d = me.data, h = '';
+    var segs = d.segs, last = d.last, lastRow = d.lastRow, finished = d.finished, lastIdx = d.lastIdx;
     var curStep = last && last.step ? last.step : { c: 'var(--accent)', label: '', icon: '' };
-    var finished = !!(last && last.step && last.step.key === 'finish');
 
     /* ---- hero ---- */
     var eyebrow = [], meta = [];
@@ -482,19 +643,15 @@
     h += '</div>';
 
     // race strip: canonical order, merged with whatever the feed has
-    var lastIdx = last && last.step ? STEPS.indexOf(last.step) : -1;
-    var byKey = {};
-    segs.forEach(function (s) { if (s.step) byKey[s.step.key] = s.data; });
     var extras = segs.filter(function (s) { return !s.step; });
-
     h += '<ol class="strip">';
     STEPS.forEach(function (st, i) {
-      var data = byKey[st.key];
+      var leg = d.legs[st.key];
       var status = 'todo';
-      if (data && (i < lastIdx || finished)) status = 'done';
-      else if (data && i === lastIdx) status = 'cur';
-      else if (!data && i < lastIdx) status = 'done';
-      var t = data ? (st.key === 'finish' ? data.rows[data.rows.length - 1].raceTime : data.rows[data.rows.length - 1].segTime) : '';
+      if (leg && leg.done) status = 'done';
+      else if (leg && leg.cur) status = 'cur';
+      else if (!leg && i < lastIdx) status = 'done';
+      var t = leg ? (st.key === 'finish' ? leg.rows[leg.rows.length - 1].raceTime : leg.rows[leg.rows.length - 1].segTime) : '';
       h += '<li class="step ' + status + '" style="--sc:' + st.c + '">' +
            '<div class="hd"><span class="ic">' + (status === 'done' ? '✓' : st.icon) + '</span>' + esc(st.label) + '</div>' +
            '<div class="tm num">' + (has(t) ? esc(t) : '–') + (status === 'cur' ? '<small>onderweg</small>' : '') + '</div></li>';
@@ -510,14 +667,8 @@
 
     /* ---- stat tiles ---- */
     if (lastRow) {
-      // rankings can lag a checkpoint behind the times; use the latest row that has them
-      var ranked = null;
-      for (var si = segs.length - 1; si >= 0 && !ranked; si--) {
-        var rr = segs[si].data.rows;
-        for (var ri = rr.length - 1; ri >= 0; ri--) if (has(rr[ri].raceRank[0])) { ranked = rr[ri]; break; }
-      }
-      var rk = ranked ? ranked.raceRank : ['', '', ''];
-      var rkAt = ranked && ranked !== lastRow ? ' bij ' + esc(ranked.loc) : '';
+      var rk = d.ranked ? d.ranked.raceRank : ['', '', ''];
+      var rkAt = d.ranked && d.ranked !== lastRow ? ' bij ' + esc(d.ranked.loc) : '';
       var when = ago(lastRow.clock);
       h += '<div class="stats">';
       h += '<div class="stat hl s-time"><div class="k">Racetijd</div><div class="v num">' + val(lastRow.raceTime) + '</div><div class="s">bij ' + esc(lastRow.loc) + '</div></div>';
@@ -526,6 +677,13 @@
       h += '<div class="stat s-rank"><div class="k">Categorie</div><div class="v num">' + val(rk[2]) + '</div><div class="s">in categorie' + rkAt + '</div></div>';
       h += '<div class="stat s-last"><div class="k">Laatste passage</div><div class="v num">' + val(lastRow.clock) + '</div><div class="s">' + (when ? esc(when) : 'tijdstip') + '</div></div>';
       h += '</div>';
+    }
+
+    /* ---- head-to-head (selected athlete first) ---- */
+    if (ATHLETES.length > 1) {
+      var other = ATHLETES.filter(function (x) { return x !== current; })[0];
+      var oc = cache[other.pid];
+      h += h2hCard({ name: current.name, pid: current.pid, data: d }, { name: other.name, pid: other.pid, data: oc && oc.data });
     }
 
     /* ---- segment cards ---- */
@@ -587,8 +745,9 @@
   }
 
   /* ---------------------------- athlete switch ---------------------------- */
+  var cache = {};           // pid -> { data, err }
   var current = ATHLETES[0];
-  var seq = 0; // ignore responses that arrive after a newer request started
+  var seq = 0;              // ignore responses that arrive after a newer refresh started
 
   function findAthlete(pid) {
     for (var i = 0; i < ATHLETES.length; i++) if (ATHLETES[i].pid === pid) return ATHLETES[i];
@@ -612,9 +771,8 @@
     try { localStorage.setItem('pid', a.pid); } catch (e) {}
     if (location.hash !== '#' + a.pid) history.replaceState(null, '', '#' + a.pid);
     renderTabs();
-    app.innerHTML = LOADING;
-    stamp.textContent = '';
-    tick();
+    render();                 // both athletes are prefetched, so switching is instant
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   tabs.addEventListener('click', function (e) {
     var b = e.target.closest('.tab');
@@ -623,22 +781,30 @@
   window.addEventListener('hashchange', function () { select(findAthlete(location.hash.replace('#', ''))); });
 
   /* ------------------------------- cycle ------------------------------- */
+  // Fetch every athlete in turn (shared sink), re-rendering as each one lands
+  // so the selected athlete never waits on the others.
   function tick() {
     var mine = ++seq;
     refreshBtn.disabled = true;
-    return load()
-      .then(function (root) {
+    var order = [current].concat(ATHLETES.filter(function (x) { return x !== current; }));
+    var chain = Promise.resolve();
+    order.forEach(function (a) {
+      chain = chain.then(function () {
         if (mine !== seq) return;
-        render(parse(root));
-        stamp.textContent = 'bijgewerkt ' + new Date().toLocaleTimeString('nl-NL');
-      })
-      .catch(function (e) {
-        if (mine !== seq) return;
-        app.innerHTML = '<div class="card"><div class="msg err"><div class="t">Laden mislukt</div><div>' +
-          esc(e.message) + '</div></div></div>';
-        stamp.textContent = '';
-      })
-      .then(function () { if (mine === seq) refreshBtn.disabled = false; });
+        return load(a.pid).then(function (root) {
+          if (mine !== seq) return;
+          cache[a.pid] = { data: parse(root), err: null };
+        }, function (e) {
+          if (mine !== seq) return;
+          cache[a.pid] = { data: cache[a.pid] && cache[a.pid].data, err: e };
+        }).then(function () {
+          if (mine !== seq) return;
+          render();
+          stamp.textContent = 'bijgewerkt ' + new Date().toLocaleTimeString('nl-NL');
+        });
+      });
+    });
+    return chain.then(function () { if (mine === seq) refreshBtn.disabled = false; });
   }
 
   current = initialAthlete();
