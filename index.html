@@ -236,7 +236,7 @@
   .cmp .hd.ath { flex-direction: row; justify-content: flex-end; align-items: center; gap: 7px; text-transform: none; letter-spacing: 0; font-size: 13.5px; font-weight: 700; color: var(--text); }
   .cmp .hd.ath .n { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .cmp .hd.ath .b { font-family: var(--display); font-size: 13px; letter-spacing: .03em; color: var(--text-3); padding: 1px 6px; border-radius: 5px; background: var(--surface); border: 1px solid var(--border); }
-  .cmp .lg { flex-direction: row; align-items: center; gap: 9px; font-weight: 600; font-size: 14px; }
+  .cmp .lg { flex-direction: row; justify-content: flex-start; align-items: center; text-align: left; gap: 9px; font-weight: 600; font-size: 14px; }
   .cmp .hd.ath .n.short { display: none; }
   .cmp .dotc { width: 24px; height: 24px; border-radius: 7px; display: inline-grid; place-items: center; font-size: 12.5px; background: color-mix(in srgb, var(--sc) 16%, transparent); flex: 0 0 auto; }
   .cmp .tv { text-align: right; font-family: var(--display); font-weight: 700; font-size: 24px; line-height: 1; color: var(--text-2); }
@@ -449,6 +449,16 @@
   // Annotate parsed data with where the athlete is on the course.
   function classify(d) {
     d.segs = d.segments.map(function (s) { return { data: s, step: stepOf(s.name) }; });
+    // UltimateLIVE puts the Finish checkpoint inside the run segment.
+    // Keep it there for the full run time, and expose it as the finish step too.
+    var finalSeg = d.segs.length ? d.segs[d.segs.length - 1] : null;
+    if (finalSeg && finalSeg.step && finalSeg.step.key === 'run') {
+      var finishRow = finalSeg.data.rows[finalSeg.data.rows.length - 1];
+      var finishStep = stepOf(finishRow.loc);
+      if (finishStep && finishStep.key === 'finish' && toSecs(finishRow.raceTime) != null) {
+        d.segs.push({ data: { name: finishRow.loc, rows: [finishRow] }, step: finishStep });
+      }
+    }
     d.last = d.segs.length ? d.segs[d.segs.length - 1] : null;
     d.lastRow = d.last ? d.last.data.rows[d.last.data.rows.length - 1] : null;
     d.finished = !!(d.last && d.last.step && d.last.step.key === 'finish');
